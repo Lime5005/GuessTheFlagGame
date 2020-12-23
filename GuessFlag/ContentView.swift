@@ -8,9 +8,69 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var countries = ["France", "UK", "Italy", "US", "Ireland", "Russia"].shuffled()
+    @State private var correctAnswer = Int.random(in: 0...2)
+    
+    @State private var showScore = false
+    @State private var scoreTitle = ""
+    @State private var triedScore = 0
+    @State private var totalTried = 0
+    
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        ZStack {
+            LinearGradient(gradient: Gradient(colors: [.yellow, .green]), startPoint: .top, endPoint: .bottom)
+                .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+            VStack(spacing: 30) {
+                VStack {
+                    Text("Tap the flag of")
+                        .foregroundColor(.white)
+                    Text(countries[correctAnswer])
+                        .foregroundColor(.white)
+                        .foregroundColor(.white)
+                        .font(.largeTitle)
+                        .fontWeight(.black)
+                }
+                ForEach(0 ..< 3) { number in
+                    Button(action: {
+                        self.flagTapped(number)
+                    }) {
+                        Image(self.countries[number])
+                            .renderingMode(.original)
+                            .clipShape(Capsule())
+                            .overlay(Capsule().stroke(Color.gray, lineWidth: 1))
+                            .shadow(color: .gray, radius: 3)
+                    }
+                }
+                Section {
+                    Text("You have correct answers: \(triedScore)/\(totalTried)")
+                }
+                Spacer()
+            }
+        }
+        .alert(isPresented: $showScore) {
+            Alert(title: Text(scoreTitle), message: Text("Your score is \(triedScore)/\(totalTried)"), dismissButton: .default(Text("Continue")) {
+                self.askQuestion()
+            })
+        }
+        
+    }
+    
+    func flagTapped(_ number: Int) {
+        if number == correctAnswer {
+            scoreTitle = "Correct"
+            triedScore += 1
+        } else {
+            scoreTitle = "Wrong! That’s the flag of \(countries[number])"
+            triedScore -= 1
+        }
+        
+        showScore = true
+        totalTried += 1
+    }
+    
+    func askQuestion() {
+        countries.shuffle()
+        correctAnswer = Int.random(in: 0...2)
     }
 }
 
