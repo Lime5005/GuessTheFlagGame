@@ -20,6 +20,8 @@ struct ContentView: View {
     
     @State private var fadeOutOpacity = false
     
+    @State private var isWrong = false
+    
     struct FlagImage: View {
         var text: String
         var body: some View {
@@ -55,6 +57,7 @@ struct ContentView: View {
                     }
                     .rotation3DEffect(.degrees(self.correct && selectedNumber == number ? 360 : 0), axis: (x: 0, y: 1, z: 0))
                     .opacity(self.fadeOutOpacity && self.selectedNumber != number ? 0.25 : 1)
+                    .rotation3DEffect(.degrees(self.isWrong && self.selectedNumber == number ? 90 : 0), axis: (x:0, y:1, z:0))
                 }
                 Section {
                     Text("You have correct answers: \(triedScore)/\(totalTried)")
@@ -81,6 +84,8 @@ struct ContentView: View {
             scoreTitle = "Wrong! That’s the flag of \(countries[number])"
             triedScore -= 1
             correct = false
+            isWrong = true
+            fadeOutOpacity = true
         }
         // DispatchQueue makes the alert appears later than the animation: showScore is later, so the alert is later
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
@@ -94,6 +99,7 @@ struct ContentView: View {
         correctAnswer = Int.random(in: 0...2)
         correct = false
         fadeOutOpacity = false
+        isWrong = false
     }
 }
 
