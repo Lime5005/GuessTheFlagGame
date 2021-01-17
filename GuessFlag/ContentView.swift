@@ -18,6 +18,8 @@ struct ContentView: View {
     @State private var triedScore = 0
     @State private var totalTried = 0
     
+    @State private var fadeOutOpacity = false
+    
     struct FlagImage: View {
         var text: String
         var body: some View {
@@ -52,6 +54,7 @@ struct ContentView: View {
                         FlagImage(text: self.countries[number])
                     }
                     .rotation3DEffect(.degrees(self.correct && selectedNumber == number ? 360 : 0), axis: (x: 0, y: 1, z: 0))
+                    .opacity(self.fadeOutOpacity && self.selectedNumber != number ? 0.25 : 1)
                 }
                 Section {
                     Text("You have correct answers: \(triedScore)/\(totalTried)")
@@ -73,6 +76,7 @@ struct ContentView: View {
             scoreTitle = "Correct"
             triedScore += 1
             correct = true
+            fadeOutOpacity = true
         } else {
             scoreTitle = "Wrong! That’s the flag of \(countries[number])"
             triedScore -= 1
@@ -89,6 +93,7 @@ struct ContentView: View {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
         correct = false
+        fadeOutOpacity = false
     }
 }
 
