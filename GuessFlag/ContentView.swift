@@ -12,6 +12,8 @@ struct ContentView: View {
     @State private var correctAnswer = Int.random(in: 0...2)
     
     @State private var showScore = false
+    @State private var correct = false
+    @State private var selectedNumber = 0
     @State private var scoreTitle = ""
     @State private var triedScore = 0
     @State private var totalTried = 0
@@ -43,10 +45,13 @@ struct ContentView: View {
                 }
                 ForEach(0 ..< 3) { number in
                     Button(action: {
-                        self.flagTapped(number)
+                        withAnimation {
+                            self.flagTapped(number)
+                        }
                     }) {
                         FlagImage(text: self.countries[number])
                     }
+                    .rotation3DEffect(.degrees(self.correct && selectedNumber == number ? 360 : 0), axis: (x: 0, y: 1, z: 0))
                 }
                 Section {
                     Text("You have correct answers: \(triedScore)/\(totalTried)")
@@ -63,21 +68,27 @@ struct ContentView: View {
     }
     
     func flagTapped(_ number: Int) {
+        selectedNumber = number
         if number == correctAnswer {
             scoreTitle = "Correct"
             triedScore += 1
+            correct = true
         } else {
             scoreTitle = "Wrong! That’s the flag of \(countries[number])"
             triedScore -= 1
+            correct = false
         }
-        
-        showScore = true
+        // DispatchQueue makes the alert appears later than the animation: showScore is later, so the alert is later
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+            showScore = true
+        }
         totalTried += 1
     }
     
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+        correct = false
     }
 }
 
